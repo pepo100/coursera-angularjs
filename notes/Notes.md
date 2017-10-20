@@ -14,7 +14,7 @@
 [Angular Guide](https://docs.angularjs.org/guide/)
 
 #### IIFE
-It’s an Immediately-Invoked Function Expression, or IIFE for short. It executes immediately after it’s created.
+It's an Immediately-Invoked Function Expression, or IIFE for short. It executes immediately after it's created.
 
 This pattern is often used when trying to avoid polluting the global namespace, because all the variables used inside the IIFE (like in any other normal function) are not visible outside its scope.
 
@@ -33,12 +33,12 @@ The ng-controller directive defines the application controller.
 ```javascript
 .controller('NameCalculatorController', function ($scope) {
 	$scope.name = "";
-   	$scope.totalValue = 0;
+	$scope.totalValue = 0;
 
 	$scope.displayNumeric = function () {
 		var totalNameValue = calculateNumericForString($scope.name);
 		$scope.totalValue = totalNameValue;
-    };
+	};
 
 
 function calculateNumericForString(string) {
@@ -59,12 +59,12 @@ To allow the minifiers to rename the function parameters and still be able to in
 ```javascript
 DIController.$inject = ['$scope', '$filter'];
 function DIController($scope, $filter) {
-     $scope.name = "Yaakov";
+	$scope.name = "Yaakov";
 
-     $scope.upper = function () {
-     var upCase = $filter('uppercase');
-          $scope.name = upCase($scope.name);
-     };
+	$scope.upper = function () {
+	var upCase = $filter('uppercase');
+		$scope.name = upCase($scope.name);
+	};
 }
 ```
 
@@ -75,14 +75,14 @@ Filters format the value of an expression for display to the user.
 ```javascript
 MsgController.$inject = ['$scope', '$filter'];
 function MsgController($scope, $filter) {
-      $scope.name = "Yaakov";
-      $scope.stateOfBeing = "hungry";
-      $scope.cookieCost = .45;
+	$scope.name = "Yaakov";
+	$scope.stateOfBeing = "hungry";
+	$scope.cookieCost = .45;
 
-      $scope.sayMessage = function () {
-           var msg = "Yaakov likes to eat healthy snacks at night!";
-           var output = $filter('uppercase')(msg);
-      return output;
+	$scope.sayMessage = function () {
+		var msg = "Yaakov likes to eat healthy snacks at night!";
+		var output = $filter('uppercase')(msg);
+	return output;
 };
 
 //OR IN TEMPLATE
@@ -99,15 +99,15 @@ Feed Yaakov Cost: {{ cookieCost | currency : "#blah" : 4 }}
 **custom filters**
 ``` javascript
 angular.module('MsgApp', [])
-      .controller('MsgController', MsgController)
-      .filter('loves', LovesFilter)
+	.controller('MsgController', MsgController)
+	.filter('loves', LovesFilter)
 
 function LovesFilter() {
-    return function (input) {
-         input = input || "";
-         input = input.replace("likes", "loves");
-    return input;
-    };
+	return function (input) {
+		input = input || "";
+		input = input.replace("likes", "loves");
+	return input;
+	};
 }
 
 MsgController.$inject = ['$scope', 'lovesFilter'];
@@ -115,8 +115,8 @@ MsgController.$inject = ['$scope', 'lovesFilter'];
 function MsgController($scope, lovesFilter) {
 
 $scope.sayLovesMessage = function () {
-     var msg = "Yaakov likes to eat healthy snacks at night!";
-     msg = lovesFilter(msg)
-     return msg;
+	var msg = "Yaakov likes to eat healthy snacks at night!";
+	msg = lovesFilter(msg)
+	return msg;
 };
 ``` javascript
