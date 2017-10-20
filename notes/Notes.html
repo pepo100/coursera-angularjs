@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Notes</title>
+</head>
+<body>
+
+    <h1 id="notes">Notes</h1>
+<h4 id="table-of-contents">Table of Contents</h4>
+<ol>
+<li><a href="#Resources">Resources</a></li>
+<li><a href="#iife">IIFE</a></li>
+<li><a href="#controllers">Controllers</a></li>
+<li><a href="#property-annotation">Property annotation</a></li>
+<li><a href="#filters">Filters</a></li>
+</ol>
+<h4 id="resources">Resources:</h4>
+<p><a href="https://www.coursera.org/learn/single-page-web-apps-with-angularjs">Coursera - Angularjs</a></p>
+<p><a href="https://www.w3schools.com/angular/">W3 School</a></p>
+<p><a href="https://docs.angularjs.org/guide/">Angular Guide</a></p>
+<h4 id="iife">IIFE</h4>
+<p>It's an Immediately-Invoked Function Expression, or IIFE for short. It executes immediately after it's created.</p>
+<p>This pattern is often used when trying to avoid polluting the global namespace, because all the variables used inside the IIFE (like in any other normal function) are not visible outside its scope.</p>
+<pre><code class="language-javascript">(function () {
+'use strict';
+
+})();
+</code></pre>
+<h4 id="controllers">Controllers</h4>
+<p>AngularJS applications are controlled by controllers.</p>
+<p>The ng-controller directive defines the application controller.</p>
+<pre><code class="language-javascript">.controller('NameCalculatorController', function ($scope) {
+	$scope.name = &quot;&quot;;
+	$scope.totalValue = 0;
+
+	$scope.displayNumeric = function () {
+		var totalNameValue = calculateNumericForString($scope.name);
+		$scope.totalValue = totalNameValue;
+	};
+
+
+function calculateNumericForString(string) {
+	var totalStringValue = 0;
+	for (var i = 0; i &lt; string.length; i++) {
+		totalStringValue += string.charCodeAt(i);
+	}
+
+	return totalStringValue;
+}
+
+});
+
+</code></pre>
+<h4 id="property-annotation">Property annotation</h4>
+<p>To allow the minifiers to rename the function parameters and still be able to inject the right services</p>
+<pre><code class="language-javascript">DIController.$inject = ['$scope', '$filter'];
+function DIController($scope, $filter) {
+	$scope.name = &quot;Yaakov&quot;;
+
+	$scope.upper = function () {
+	var upCase = $filter('uppercase');
+		$scope.name = upCase($scope.name);
+	};
+}
+</code></pre>
+<h4 id="filters">Filters</h4>
+<p>Filters format the value of an expression for display to the user.</p>
+<p><a href="https://docs.angularjs.org/api/ng/filter">build-in filters</a></p>
+<pre><code class="language-javascript">MsgController.$inject = ['$scope', '$filter'];
+function MsgController($scope, $filter) {
+	$scope.name = &quot;Yaakov&quot;;
+	$scope.stateOfBeing = &quot;hungry&quot;;
+	$scope.cookieCost = .45;
+
+	$scope.sayMessage = function () {
+		var msg = &quot;Yaakov likes to eat healthy snacks at night!&quot;;
+		var output = $filter('uppercase')(msg);
+	return output;
+};
+
+//OR IN TEMPLATE
+
+Feed Yaakov Cost: {{ cookieCost | currency : &quot;#blah&quot; : 4 }}
+
+</code></pre>
+<p><strong>chaining</strong></p>
+<pre><code>{{ sayLovesMessage() | truth : 'healthy' : 'cookie' | uppercase }}
+</code></pre>
+<p><strong>custom filters</strong></p>
+<pre><code class="language-javascript">angular.module('MsgApp', [])
+	.controller('MsgController', MsgController)
+	.filter('loves', LovesFilter)
+
+function LovesFilter() {
+	return function (input) {
+		input = input || &quot;&quot;;
+		input = input.replace(&quot;likes&quot;, &quot;loves&quot;);
+	return input;
+	};
+}
+
+MsgController.$inject = ['$scope', 'lovesFilter'];
+
+function MsgController($scope, lovesFilter) {
+
+$scope.sayLovesMessage = function () {
+	var msg = &quot;Yaakov likes to eat healthy snacks at night!&quot;;
+	msg = lovesFilter(msg)
+	return msg;
+};
+``` javascript
+</code></pre>
+
+
+</body>
+</html>

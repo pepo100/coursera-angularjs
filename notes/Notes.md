@@ -2,10 +2,10 @@
 
 #### Table of Contents
 1. [Resources](#Resources)
-2. [IIFE](#IIFE)
-3. [Controllers](#Controllers)
+2. [IIFE]
+3. [Controllers]
 4. [Property annotation]
-5. [Filters](#Filters)
+5. [Filters]
 #### Resources:
 [Coursera - Angularjs](https://www.coursera.org/learn/single-page-web-apps-with-angularjs)
 
