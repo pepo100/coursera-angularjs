@@ -1,0 +1,15 @@
+﻿<table class="table" ng-if="dirCtlr.list.length">
+    <tr>
+        <th>Name</th>
+        <th>Desc</th>
+        <th>Prize</th>
+        <th>Remove</th>
+    </tr>
+    <tr ng-repeat="item in dirCtlr.list">
+        <td>{{item.name}}</td>
+        <td>{{item.desc}}</td>
+        <td>{{item.prize | currency:"€"}}</td>
+        <td><button class="btn" ng-click="dirCtlr.onRemove({index: $index});">Don't want this one!</button></td>
+        
+    </tr>
+</table>

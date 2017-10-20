@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" ng-app="NarrowItDownApp">
+<head>
+    <title>Narrow Down Your Menu Choice</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles/bootstrap.min.css">
+    <link rel="stylesheet" href="styles/styles.css">
+</head>
+<body>
+    <div class="container" ng-controller="NarrowItDownController as nw">
+        <h1>Narrow Down Your Chinese Menu Choice</h1>
+         <p> App to search of the menu items using the restaurant server REST API:</p>
+        <ul>
+            <li>Search in the descriptions of menu items.
+                <ul>
+                    <li>If empty input then return all items</li>
+                    <li>If word not found in description then error message will appear</li>
+                </ul>
+            </li>
+            <li>Click "Narrow It Down For Me!" to remove item from list</li> 
+        </ul>
+        <a href="https://github.com/jhu-ep-coursera/fullstack-course5/blob/master/assignments/assignment3/Assignment-3.md">About</a>
+
+        <form class="form-inline">
+            <div class="form-group">
+                <input type="text" placeholder="search term" class="form-control" ng-model="nw.searchTerm">
+            </div>
+            <div class="form-group narrow-button">
+                <button class="btn btn-primary" ng-click="nw.search(nw.searchTerm)">Narrow It Down For Me!</button>
+            </div>
+        </form>
+        <p style="color:red" ng-if="nw.message">{{nw.message}}</p>
+        <found-items list="nw.found" on-remove="nw.remove(index)" bad-remove="nw.remove"></found-items>
+
+    </div>
+    <script src="js/angular.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
