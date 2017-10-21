@@ -2,13 +2,12 @@
 
 #### Table of Contents
 1. [Week 1]
-   1. [Resources](#Resources)
-   2. [IIFE](#IIFE)
-   3. [Controllers](#Controllers)
-   4. [Property annotation](#property-annotation)
-   5. [Filters](#filters)
+   1. [IIFE](#iife)
+   2. [Controllers](ontrollers)
+   3. [Property annotation](#property-annotation)
+   4. [Filters](#filters)
 2. [Week 4]
-   1. [Components](#Components)
+   1. [Components](#components)
    2. [Events](#events)
    3. [Modules](#modules)
    4. [Routing](#routing)

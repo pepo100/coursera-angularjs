@@ -51,6 +51,26 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "module1-solution", "module1
 		SlnRelativePath = "module1-solution\"
 	EndProjectSection
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "module4-solution", "module4-solution\", "{1D05469A-0CB2-44B2-A297-06ECA68798BF}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_53919"
+		Debug.AspNetCompiler.PhysicalPath = "module4-solution\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_53919\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_53919"
+		Release.AspNetCompiler.PhysicalPath = "module4-solution\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_53919\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "53919"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,6 +80,8 @@ Global
 		{8FCFEBD2-9254-4624-A84D-BF58D43D74ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A7041A2-2985-4906-A865-0A78634A048E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7A7041A2-2985-4906-A865-0A78634A048E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D05469A-0CB2-44B2-A297-06ECA68798BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D05469A-0CB2-44B2-A297-06ECA68798BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
