@@ -8,16 +8,30 @@
     <h1 id="notes">Notes</h1>
 <h4 id="table-of-contents">Table of Contents</h4>
 <ol>
+<li><a href="#week-1">Week 1</a>
+<ol>
 <li><a href="#Resources">Resources</a></li>
-<li><a href="#iife">IIFE</a></li>
-<li><a href="#controllers">Controllers</a></li>
+<li><a href="#IIFE">IIFE</a></li>
+<li><a href="#Controllers">Controllers</a></li>
 <li><a href="#property-annotation">Property annotation</a></li>
 <li><a href="#filters">Filters</a></li>
+</ol>
+</li>
+<li><a href="#week-4">Week 4</a>
+<ol>
+<li><a href="#Components">Components</a></li>
+<li><a href="#events">Events</a></li>
+<li><a href="#modules">Modules</a></li>
+<li><a href="#routing">Routing</a></li>
+</ol>
+</li>
 </ol>
 <h4 id="resources">Resources:</h4>
 <p><a href="https://www.coursera.org/learn/single-page-web-apps-with-angularjs">Coursera - Angularjs</a></p>
 <p><a href="https://www.w3schools.com/angular/">W3 School</a></p>
 <p><a href="https://docs.angularjs.org/guide/">Angular Guide</a></p>
+<h2 id="week-1">Week 1</h2>
+<p>Angular Introduction</p>
 <h4 id="iife">IIFE</h4>
 <p>It's an Immediately-Invoked Function Expression, or IIFE for short. It executes immediately after it's created.</p>
 <p>This pattern is often used when trying to avoid polluting the global namespace, because all the variables used inside the IIFE (like in any other normal function) are not visible outside its scope.</p>
@@ -108,7 +122,498 @@ $scope.sayLovesMessage = function () {
 	msg = lovesFilter(msg)
 	return msg;
 };
-``` javascript
+</code></pre>
+<h2 id="week-4">Week 4</h2>
+<p>Components, Events, Modules, Routers</p>
+<h4 id="components">Components</h4>
+<p>Component is a special kind of directive that uses a simpler configuration which is suitable for a component-based application structure.</p>
+<p>Declaration:</p>
+<pre><code class="language-javascript">angular.module('ShoppingListComponentApp', [])
+.controller('ShoppingListController', ShoppingListController)
+.factory('ShoppingListFactory', ShoppingListFactory)
+.component('shoppingList', {
+  templateUrl: 'shoppingList.html',
+  controller: ShoppingListComponentController,
+  bindings: {
+    items: '&lt;',
+    myTitle: '@title',
+    onRemove: '&amp;'
+  }
+}); 
+
+</code></pre>
+<p>Components have a well-defined lifecycle</p>
+<ul>
+<li>$onInit() - Called on each controller after all the controllers on an element have been constructed and had their bindings initialized (and before the pre &amp; post linking functions for the directives on this element). This is a good place to put initialization code for your controller.</li>
+<li>$onChanges(changesObj) - Called whenever one-way bindings are updated. The changesObj is a hash whose keys are the names of the bound properties that have changed, and the values are an object of the form { currentValue, previousValue, isFirstChange() }. Use this hook to trigger updates within a component such as cloning the bound value to prevent accidental mutation of the outer value.</li>
+<li>$doCheck() - Called on each turn of the digest cycle. Provides an opportunity to detect and act on changes. Any actions that you wish to take in response to the changes that you detect must be invoked from this hook; implementing this has no effect on when $onChanges is called. For example, this hook could be useful if you wish to perform a deep equality check, or to check a Date object, changes to which would not be detected by AngularJS's change detector and thus not trigger $onChanges. This hook is invoked with no arguments; if detecting changes, you must store the previous value(s) for comparison to the current values.</li>
+<li>$onDestroy() - Called on a controller when its containing scope is destroyed. Use this hook for releasing external resources, watches and event handlers.</li>
+<li>$postLink() - Called after this controller's element and its children have been linked. Similar to the post-link function this hook can be used to set up DOM event handlers and do direct DOM manipulation. Note that child elements that contain templateUrl directives will not have been compiled and linked since they are waiting for their template to load asynchronously and their own compilation and linking has been suspended until that occurs. This hook can be considered analogous to the ngAfterViewInit and ngAfterContentInit hooks in Angular. Since the compilation process is rather different in AngularJS there is no direct mapping and care should be taken when upgrading.</li>
+</ul>
+<pre><code class="language-javascript">ShoppingListComponentController.$inject = ['$element']
+function ShoppingListComponentController($element) {
+  var $ctrl = this;
+  var totalItems;
+...
+  $ctrl.$onInit = function () {
+    totalItems = 0;
+  };
+
+  $ctrl.$onChanges = function (changeObj) {
+    console.log(&quot;Changes: &quot;, changeObj);
+  }
+
+  $ctrl.$doCheck = function () {
+    if ($ctrl.items.length !== totalItems) {
+      console.log(&quot;# of items changed. Checking for Cookies!&quot;);
+      totalItems = $ctrl.items.length;
+      if ($ctrl.cookiesInList()) {
+        console.log(&quot;Oh, NO! COOKIES!!!!!&quot;);
+        var warningElem = $element.find('div.error');
+        warningElem.slideDown(900);
+      }
+      else {
+        console.log(&quot;No cookies here. Move right along!&quot;);
+        var warningElem = $element.find('div.error');
+        warningElem.slideUp(900);
+      }
+    }
+  };  
+...
+</code></pre>
+<h4 id="events">Events</h4>
+<ul>
+<li><p>Publish-subscribe from anywhere in system</p>
+</li>
+<li><p>$scope.$emit sends the event up to scope</p>
+</li>
+<li><p>$scope.$broadcas down the chain</p>
+</li>
+<li><p>to all nodes use $rootScope.$broadcast (must be deregister)</p>
+</li>
+<li><p>listen -&gt; $scope.$on, $rootScope.$on</p>
+</li>
+</ul>
+<pre><code class="language-javascript">.component('shoppingList', {
+  templateUrl: 'shoppingList.html',
+  controller: ShoppingListComponentController,
+  bindings: {
+    items: '&lt;',
+    myTitle: '@title',
+    onRemove: '&amp;'
+  }
+})
+.component('loadingSpinner', {
+  templateUrl: 'spinner.html',
+  controller: SpinnerController
+});
+</code></pre>
+<pre><code class="language-javascript">SpinnerController.$inject = ['$rootScope']
+function SpinnerController($rootScope) {
+  var $ctrl = this;
+
+  var cancelListener = $rootScope.$on('shoppinglist:processing', function (event, data) {
+    console.log(&quot;Event: &quot;, event);
+    console.log(&quot;Data: &quot;, data);
+
+    if (data.on) {
+      $ctrl.showSpinner = true;
+    }
+    else {
+      $ctrl.showSpinner = false;
+    }
+  });
+
+  $ctrl.$onDestroy = function () {
+    cancelListener();
+  };
+
+}; 
+</code></pre>
+<pre><code class="language-javascript">ShoppingListComponentController.$inject = ['$rootScope', '$element', '$q', 'WeightLossFilterService']
+function ShoppingListComponentController($rootScope, $element, $q, WeightLossFilterService) {
+  var $ctrl = this;
+  var totalItems;
+
+  $ctrl.$onInit = function () {
+    totalItems = 0;
+  };
+
+
+  $ctrl.$doCheck = function () {
+    if ($ctrl.items.length !== totalItems) {
+      totalItems = $ctrl.items.length;
+
+      $rootScope.$broadcast('shoppinglist:processing', {on: true});
+      var promises = [];
+      for (var i = 0; i &lt; $ctrl.items.length; i++) {
+        promises.push(WeightLossFilterService.checkName($ctrl.items[i].name));
+      }
+
+      $q.all(promises)
+      .then(function (result) {
+        // Remove cookie warning
+        var warningElem = $element.find('div.error');
+        warningElem.slideUp(900);
+      })
+      .catch(function (result) {
+        // Show cookie warning
+        var warningElem = $element.find('div.error');
+        warningElem.slideDown(900);
+      })
+      .finally(function () {
+        $rootScope.$broadcast('shoppinglist:processing', { on: false });
+      });
+    }
+  };
+
+</code></pre>
+<h4 id="modules">Modules</h4>
+<p>Provide modularity for your application</p>
+<ul>
+<li>module.config method fires before module.run</li>
+<li>dependency modules get configured first</li>
+</ul>
+<p><strong>project structure</strong>
+Example</p>
+<ul>
+<li>css</li>
+<li>images</li>
+<li>lib
+<ul>
+<li>angular.min.js</li>
+<li>jquery-3.1.0.min.js</li>
+</ul>
+</li>
+<li>src
+<ul>
+<li>shoppinglist
+<ul>
+<li>shoppinglist.component.js</li>
+<li>shoppinglist.controller.js</li>
+<li>shoppinglist.factory.js</li>
+<li>shoppinglist.module.js</li>
+<li>shoppinglist.template.html</li>
+<li>weigthlossfilter.service</li>
+</ul>
+</li>
+<li>spinner
+<ul>
+<li>loadingspinner.component.js</li>
+<li>loadingspinner.template.html</li>
+<li>spinner.module</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-html"> &lt;!-- Libraries --&gt;
+    &lt;script src=&quot;lib/jquery-3.1.0.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;lib/angular.min.js&quot;&gt;&lt;/script&gt;
+
+    &lt;!-- Modules --&gt;
+
+    &lt;script src=&quot;src/shoppinglist/shoppinglist.module.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;src/spinner/spinner.module.js&quot;&gt;&lt;/script&gt;
+
+    &lt;!-- 'ShoppingList' module artifacts --&gt;
+    &lt;script src=&quot;src/shoppinglist/shoppinglist.component.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;src/shoppinglist/shoppinglist.controller.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;src/shoppinglist/shoppinglist.factory.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;src/shoppinglist/weightlossfilter.service.js&quot;&gt;&lt;/script&gt;
+
+    &lt;!-- 'Spinner' module artifacts --&gt;
+    &lt;script src=&quot;src/spinner/loadingspinner.component.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+<p>shoppinglist.module:</p>
+<pre><code class="language-javascript">(function () {
+'use strict';
+
+angular.module('ShoppingList', ['Spinner']);
+
+angular.module('ShoppingList')
+.config(function () {
+  console.log(&quot;ShoppingList config fired.&quot;);
+})
+.run(function () {
+  console.log(&quot;ShoppingList run fired.&quot;);
+});
+
+})(); 
+</code></pre>
+<p>shoppinglist.component.module:</p>
+<pre><code class="language-javascript">(function () {
+'use strict';
+
+angular.module('ShoppingList')
+.component('shoppingList', {
+  templateUrl: 'src/shoppinglist/shoppinglist.template.html',
+  controller: ShoppingListComponentController,
+  bindings: {
+    items: '&lt;',
+    myTitle: '@title',
+    onRemove: '&amp;'
+  }
+});
+
+
+ShoppingListComponentController.$inject = ['$rootScope', '$element', '$q', 'WeightLossFilterService']
+function ShoppingListComponentController($rootScope, $element, $q, WeightLossFilterService) { 
+</code></pre>
+<h4 id="routing">Routing</h4>
+<table>
+<thead>
+<tr>
+<th>ngRoute</th>
+<th>ui-router</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Google</td>
+<td>Community</td>
+</tr>
+<tr>
+<td>No UI state</td>
+<td>UI state is central</td>
+</tr>
+<tr>
+<td>Route by URL</td>
+<td>UI state base URL</td>
+</tr>
+<tr>
+<td>No nested views</td>
+<td>Nested view</td>
+</tr>
+<tr>
+<td>OK for prototypes</td>
+<td>most popular</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-javascript">
+(function () {
+
+angular.module('RoutingApp',['ui.router']);
+
+angular.module('RoutingApp')
+.config(RoutesConfig);
+
+RoutesConfig.$inject = ['$stateProvider', '$urlRouterProvider'];
+function RoutesConfig($stateProvider, $urlRouterProvider) {
+
+  // Redirect to tab 1 if no other URL matches
+  $urlRouterProvider.otherwise('/tab1'); 
+
+  // Set up UI states
+  $stateProvider
+    .state('tab1', {
+      url: '/tab1', // optional-&gt; change url
+      templateUrl: 'src/tab1.html'
+    })
+
+    .state('tab2', {
+      url: '/tab2',
+      templateUrl: 'src/tab2.html'
+    });
+}
+
+
+})(); 
+
+</code></pre>
+<p>index.html</p>
+<pre><code class="language-html">    &lt;div class=&quot;tabs&quot;&gt;
+      &lt;a ui-sref=&quot;tab1&quot; ui-sref-active=&quot;activeTab&quot;&gt;Tab 1&lt;/a&gt; //ui-sref-active set up class for Tab1 if active
+      &lt;a ui-sref=&quot;tab2&quot; ui-sref-active=&quot;activeTab&quot;&gt;Tab 2&lt;/a&gt;
+      &lt;!-- &lt;button ui-sref=&quot;tab2&quot;&gt;Tab 2&lt;/button&gt; --&gt;
+    &lt;/div&gt;
+
+    &lt;ui-view&gt;&lt;/ui-view&gt;
+
+    &lt;!-- Libraries --&gt;
+    &lt;script src=&quot;lib/angular.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;lib/angular-ui-router.min.js&quot;&gt;&lt;/script&gt;
+
+
+</code></pre>
+<p><strong>state with controller</strong>
+declare a controller that is responsible for the state's template right in the state's declaration</p>
+<pre><code class="language-javascript">  // *** Set up UI states ***
+  $stateProvider
+
+  // Home page
+  .state('home', {
+    url: '/',
+    templateUrl: 'src/shoppinglist/templates/home.template.html'
+  })
+
+  // Premade list page
+  .state('mainList', {
+    url: '/main-list',
+    templateUrl: 'src/shoppinglist/templates/main-shoppinglist.template.html',
+    controller: 'MainShoppingListController as mainList'
+  });
+}
+</code></pre>
+<p>main-shoppinglist.template.html:</p>
+<pre><code class="language-html">&lt;!-- &lt;div id=&quot;list&quot; ng-controller='MainShoppingListController as mainList'&gt; --&gt;
+  &lt;a ui-sref=&quot;home&quot;&gt;Home&lt;/a&gt; &amp;lt; &lt;span&gt;List&lt;/span&gt;
+  &lt;h3&gt;Premade List with Absolutely No Cookies in it&lt;/h3&gt;
+  &lt;shopping-list items=&quot;mainList.items&quot;&gt;&lt;/shopping-list&gt;
+&lt;!-- &lt;/div&gt; --&gt;
+
+</code></pre>
+<h5 id="handling-data-with-routing">Handling data with routing</h5>
+<ul>
+<li><strong>Resolve</strong> property can be used to inject values directly into the controller responsible for the state.
+<ul>
+<li>If resolve property is a promis -&gt; will not render state until datas retrieve</li>
+</ul>
+</li>
+</ul>
+<p>routes.js:</p>
+<pre><code class="language-javascript">.state('mainList', {
+    url: '/main-list',
+    templateUrl: 'src/shoppinglist/templates/main-shoppinglist.template.html',
+    controller: 'MainShoppingListController as mainList',
+    resolve: {
+      items: ['ShoppingListService', function (ShoppingListService) {
+        return ShoppingListService.getItems();
+      }]
+    }
+  });
+
+</code></pre>
+<p>main-shoppinglist.controler.js:</p>
+<pre><code class="language-js">// MainShoppingListController.$inject = ['ShoppingListService'];
+// function MainShoppingListController(ShoppingListService) {
+MainShoppingListController.$inject = ['items'];
+function MainShoppingListController(items) {
+  var mainList = this;
+  mainList.items = items;
+
+  // mainList.$onInit = function () {
+  //   ShoppingListService.getItems()
+  //   .then(function (result) {
+  //     mainList.items = result;
+  //   });
+  // };
+}
+</code></pre>
+<ul>
+<li>State's url property can be declared with <strong>parameters</strong> &quot;/&quot;
+<ul>
+<li>user $stateParams service to retrieve parameters &quot;$stateParams.paramName</li>
+<li>construct a ulr with ui-sref directive: ui-sref=&quot;stateName()</li>
+</ul>
+</li>
+</ul>
+<p>routes.js</p>
+<pre><code class="language-js">.state('itemDetail', {
+    url: '/item-detail/{itemId}',
+    templateUrl: 'src/shoppinglist/templates/item-detail.template.html',
+    controller: 'ItemDetailController as itemDetail',
+    resolve: {
+      item: ['$stateParams', 'ShoppingListService',
+            function ($stateParams, ShoppingListService) {
+              return ShoppingListService.getItems()
+                .then(function (items) {
+                  return items[$stateParams.itemId];
+                });
+            }]
+    }
+  }); 
+</code></pre>
+<p>shoppinglist.template.html:</p>
+<pre><code class="language-html">&lt;ul&gt;
+  &lt;li ng-repeat=&quot;item in $ctrl.items&quot;
+      ui-sref=&quot;itemDetail({itemId: $index})&quot;&gt;
+    {{ item.quantity }} of {{ item.name }}
+  &lt;/li&gt;
+&lt;/ul&gt;
+</code></pre>
+<ul>
+<li>Nested states allow nested views
+<ul>
+<li>Parent state has ui-view for child state</li>
+<li>child state is declared as parent.child</li>
+<li>Parent resolve property is inherited by child</li>
+</ul>
+</li>
+</ul>
+<p>reuters.js:</p>
+<pre><code class="language-js">  // Item detail
+  .state('mainList.itemDetail', {
+    // url: '/item-detail/{itemId}',
+    templateUrl: 'src/shoppinglist/templates/item-detail.template.html',
+    controller: 'ItemDetailController as itemDetail',
+    params: {
+      itemId: null
+    }
+  });
+</code></pre>
+<p>main-shoppinglist.template.html:</p>
+<pre><code class="language-html">&lt;a ui-sref=&quot;home&quot;&gt;Home&lt;/a&gt; &amp;lt; &lt;span&gt;List&lt;/span&gt;
+
+&lt;h3&gt;Premade List with Absolutely No Cookies in it&lt;/h3&gt;
+&lt;shopping-list items=&quot;mainList.items&quot;&gt;&lt;/shopping-list&gt;
+
+&lt;ui-view&gt;&lt;/ui-view&gt;
+
+</code></pre>
+<ul>
+<li>ui-router State Change Events
+<ul>
+<li>exposes numerous change events</li>
+<li>all are fired to $rootScope</li>
+<li>$stateChangeStart - starts the state transition
+<ul>
+<li>call event.preventDefault() to prevent the transition</li>
+</ul>
+</li>
+<li>$stateChangeSuccess - indicates a successful transition</li>
+<li>$stateChangeError -indicates error (including errors in the resolve)
+<ul>
+<li>catch ALL errors during state change</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>spinner.component.js</p>
+<pre><code class="language-js">SpinnerController.$inject = ['$rootScope']
+function SpinnerController($rootScope) {
+  var $ctrl = this;
+  var cancellers = [];
+
+  $ctrl.$onInit = function () {
+    var cancel = $rootScope.$on('$stateChangeStart',
+    function(event, toState, toParams, fromState, fromParams, options){
+      $ctrl.showSpinner = true;
+    });
+    cancellers.push(cancel);
+
+    cancel = $rootScope.$on('$stateChangeSuccess',
+    function(event, toState, toParams, fromState, fromParams){
+      $ctrl.showSpinner = false;
+    });
+    cancellers.push(cancel);
+
+    cancel = $rootScope.$on('$stateChangeError',
+    function(event, toState, toParams, fromState, fromParams, error){
+      $ctrl.showSpinner = false;
+    });
+    cancellers.push(cancel);
+  };
+
+  $ctrl.$onDestroy = function () {
+    cancellers.forEach(function (item) {
+      item();
+    });
+  };
+
+};
 </code></pre>
 
 

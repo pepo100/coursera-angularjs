@@ -48,6 +48,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "module1-solution", "module1
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		VWDPort = "58373"
+		SlnRelativePath = "module1-solution\"
 	EndProjectSection
 EndProject
 Global
