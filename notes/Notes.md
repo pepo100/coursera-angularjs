@@ -1,26 +1,30 @@
 # Notes
 
 #### Table of Contents
-1. [Week 1]
+1. [Week 1](#week-1)
    1. [IIFE](#iife)
    2. [Controllers](#controllers)
    3. [Property annotation](#property-annotation)
-2. [Week 2]
+2. [Week 2](#week-2)
    1. [Filters](#filters)
    2. [Digest](#digest)
    3. [repeat, if, show, hide](#ng-repeat)
    4. [Services](#services)
-3. [Week 3]
+3. [Week 3](#week-3)
    1. [Promises](#promises)
    2. [Ajax](#ajax)
    3. [Directives](#directives)
-4. [Week 4]
+4. [Week 4](#week-4)
    1. [Components](#components)
    2. [Events](#events)
    3. [Modules](#modules)
    4. [Routing](#routing)
 
-
+#### Assignments
+[Week-1](https://github.com/pepo100/coursera-angularjs/tree/master/module1-solution)
+[Week-2](https://github.com/pepo100/coursera-angularjs/tree/master/module2-solution)
+[Week-3](https://github.com/pepo100/coursera-angularjs/tree/master/module3-solution)
+[Week-4](https://github.com/pepo100/coursera-angularjs/tree/master/module4-solution)
 #### Resources:
 [Coursera - Angularjs](https://www.coursera.org/learn/single-page-web-apps-with-angularjs)
 
@@ -338,7 +342,7 @@ function ShoppingListController1(ShoppingListFactory) {
 
 **Service Provider + config**
 
-``` javascript 
+``` js
 
 function ShoppingListServiceProvider() {
      var provider = this;
