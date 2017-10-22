@@ -3,10 +3,18 @@
 #### Table of Contents
 1. [Week 1]
    1. [IIFE](#iife)
-   2. [Controllers](ontrollers)
+   2. [Controllers](#controllers)
    3. [Property annotation](#property-annotation)
-   4. [Filters](#filters)
-2. [Week 4]
+2. [Week 2]
+   1. [Filters](#filters)
+   2. [Digest](#digest)
+   3. [repeat, if, show, hide](#ng-repeat)
+   4. [Services](#services)
+3. [Week 3]
+   1. [Promises](#promises)
+   2. [Ajax](#ajax)
+   3. [Directives](#directives)
+4. [Week 4]
    1. [Components](#components)
    2. [Events](#events)
    3. [Modules](#modules)
@@ -77,6 +85,8 @@ function DIController($scope, $filter) {
 	};
 }
 ```
+## Week 2
+Filters, Digest Cycle, Controller Inheritance, and Custom Services
 
 #### Filters
 Filters format the value of an expression for display to the user.
@@ -130,6 +140,389 @@ $scope.sayLovesMessage = function () {
 	return msg;
 };
 ``` 
+
+**js - filter**
+``` javascript
+var searchValue = "Bismol";
+
+function containsFilter(value) {
+      return value.indexOf(searchValue) !== -1;
+}
+var searchedShoppingList = shoppingList.filter(containsFilter);
+```
+**angular - filter**
+
+https://docs.angularjs.org/api/ng/filter/filter
+```html
+<tr ng-repeat="friend in friends | filter:searchText">
+```
+
+#### digest
+The $scope.$digest() function iterates through 
+all the watches in the $scope object, 
+and its child $scope objects (if it has any). 
+When $digest() iterates over the watches, 
+it calls the value function for each watch. 
+If the value returned by the value function is different than the value 
+it returned the last time it was called, the listener function for that watch is called.
+
+The $scope.$apply() function takes a function as parameter which is executed, and after that $scope.$digest() is called internally
+
+Example: after $timeaout function diggest will be executed
+``` javascript
+CounterController.$inject = ['$scope', '$timeout'];
+
+run diggest after function is done 
+
+function CounterController($scope, $timeout) {
+      $scope.counter = 0;
+
+      $scope.upCounter = function () {
+           $timeout(function () {
+                 $scope.counter++;
+                 console.log("Counter incremented!");
+       }, 2000);
+};
+```
+
+
+One time binding:
+{{ :: fullName }}
+
+Watcher counts:
+console.log("# of Watchers: ", $scope.$$watchersCount);
+
+#### ng-repeat
+
+``` javascript
+var shoppingList1 = [
+"Milk", "Donuts", "Cookies", "Chocolate", "Peanut Butter", "Pepto Bismol", "Pepto Bismol (Chocolate flavor)", "Pepto Bismol (Cookie flavor)"
+];
+
+var shoppingList2 = [
+{
+name: "Milk",
+quantity: "2"
+},
+{
+name: "Donuts",
+quantity: "200"
+},
+
+ 
+
+function ShoppingListController($scope) {
+    $scope.shoppingList1 = shoppingList1;
+    $scope.shoppingList2 = shoppingList2;
+
+    $scope.addToList = function () {
+          var newItem = {
+              name: $scope.newItemName,
+              quantity: $scope.newItemQuantity
+          };
+
+         $scope.shoppingList2.push(newItem);
+    };
+
+```
+
+``` html
+Get shopping List:
+<li ng-repeat = "item in shoppingList2" {{$index + 1}}. Buy {{item.quantity}} of {{item.name}}(s) </li>
+
+Add to shopping list:
+<input type="text" ng-model="newItemName" placeholder="item name">
+
+<input type="text" ng-model="newItemQuantity" placeholder="item quantity">
+
+<button ng-click="addToList()">Add To List</button>
+```
+
+**ng-if, ng-show, ng-hide**
+``` html
+
+<div ng-if="list.errorMessage" class="error">Error: {{list.errorMessage}}</div>
+<div ng-show="list.errorMessage" class="error">Error: {{list.errorMessage}}</div>
+<div ng-hide="!list.errorMessage" class="error">Error: {{list.errorMessage}}</div>
+```
+
+#### Services
+
+Service - single instance
+
+``` javascript
+angular.module('ShoppingListApp', [])
+.controller('ShoppingListAddController', ShoppingListAddController)
+.controller('ShoppingListShowController', ShoppingListShowController)
+.service('ShoppingListService', ShoppingListService);
+
+ShoppingListAddController.$inject = ['ShoppingListService'];
+function ShoppingListAddController(ShoppingListService) {
+
+    var itemAdder = this;
+
+    itemAdder.itemName = "";
+    itemAdder.itemQuantity = "";
+
+    itemAdder.addItem = function () {
+            ShoppingListService.addItem(itemAdder.itemName, itemAdder.itemQuantity);
+    }
+}
+
+
+ShoppingListShowController.$inject = ['ShoppingListService'];
+function ShoppingListShowController(ShoppingListService) {
+
+    var showList = this;
+
+    showList.items = ShoppingListService.getItems();
+
+    showList.removeItem = function (itemIndex) {
+           ShoppingListService.removeItem(itemIndex);
+    };
+}
+
+
+function ShoppingListService() {
+
+    var service = this;
+
+    // List of shopping items
+    var items = [];
+
+    service.addItem = function (itemName, quantity) {
+        var item = {
+              name: itemName,
+              quantity: quantity
+        };
+        items.push(item);
+    };
+
+    service.removeItem = function (itemIdex) {
+           items.splice(itemIdex, 1);
+    };
+
+    service.getItems = function () {
+           return items;
+    };
+```
+
+**Service Factory**
+
+```javascript
+function ShoppingListFactory() {
+    var factory = function (maxItems) {
+          return new ShoppingListService(maxItems);
+     };
+    return factory;
+    }
+})();
+
+angular.module('ControllerAsApp', [])
+.controller('ShoppingListController1', ShoppingListController1)
+.controller('ShoppingListController2', ShoppingListController2)
+.factory('ShoppingListFactory', ShoppingListFactory);
+
+ 
+// LIST #1 - controller
+ShoppingListController1.$inject = ['ShoppingListFactory'];
+function ShoppingListController1(ShoppingListFactory) {
+     var list1 = this;
+
+     // Use factory to create new shopping list service
+     var shoppingList = ShoppingListFactory(3);
+
+     list1.items = shoppingList.getItems();
+
+```
+
+**Service Provider + config**
+
+``` javascript 
+
+function ShoppingListServiceProvider() {
+     var provider = this;
+
+      provider.defaults = {
+          maxItems: 10
+       };
+
+      provider.$get = function () {
+         var shoppingList = new ShoppingListService(provider.defaults.maxItems);
+
+      return shoppingList;
+      };
+}
+
+angular.module('ShoppingListApp', [])
+.controller('ShoppingListController', ShoppingListController)
+.provider('ShoppingListService', ShoppingListServiceProvider)
+.config(Config);
+
+Config.$inject = ['ShoppingListServiceProvider'];
+function Config(ShoppingListServiceProvider) {
+       ShoppingListServiceProvider.defaults.maxItems = 2;
+}
+
+
+ShoppingListController.$inject = ['ShoppingListService'];
+function ShoppingListController(ShoppingListService) {
+      var list = this;
+
+      list.items = ShoppingListService.getItems();
+...
+```
+
+## Week 3
+Promises, Ajax, and Custom Directives
+
+#### Promises
+
+Asynchronous with promises and $q
+
+``` javascript
+WeightLossFilterService.$inject = ['$q'];
+function WeightLossFilterService($q) { {
+    
+    service.checkName = function(name){
+        var deferred = $q.defer(); // create async environmnet
+
+        var result = {
+             message: "" 
+        };
+
+        $timeout(function () {
+             // Check for cookies
+             if (name.toLowerCase().indexOf('cookie') === -1) {
+                    deferred.resolve(result) // marks successfull
+             }
+             else {
+                    result.message = "Stay away from cookies, Yaakov!";
+                    deferred.reject(result); // marks unsucessfull
+             }
+        }, 3000);
+
+        return deferred.promise; //return promise
+    }
+}
+```
+with one promise
+``` js
+
+caller function() {
+
+    var promise = asyncFunction();
+
+    promise.then(function (result) {
+
+        //do something with result
+
+    },
+
+    function(error) {
+
+         //do something with error
+
+    });
+
+}
+```
+
+with multiple sequentially
+``` javascript
+var promise = WeightLossFilterService.checkName(name);
+
+promise
+.then(function (response) {
+    return WeightLossFilterService.checkQuantity(quantity);
+ })
+ .then(function (response) {
+       var item = {
+             name: name,
+             quantity: quantity
+        };
+       items.push(item);
+ })
+ .catch(function (errorResponse) {
+        console.log(errorResponse.message);
+ });
+```
+
+with multiple paralller
+
+``` javascript
+var namePromise = WeightLossFilterService.checkName(name);
+var quantityPromise = WeightLossFilterService.checkQuantity(quantity);
+
+$q.all([namePromise, quantityPromise]).
+ then(function (response) {
+          var item = {
+                 name: name,
+                 quantity: quantity
+          };
+         items.push(item);
+})
+.catch(function (errorResponse) {
+         console.log(errorResponse.message);
+});
+```
+
+#### Ajax
+``` javascript
+service.getMenuForCategory = function (shortName) {
+       var response = $http({
+             method: "GET",
+             url: (ApiBasePath + "/menu_items.json"),
+             params: {
+                     category: shortName
+             }
+        });
+
+        return response;
+};
+
+}
+```
+
+#### Directives
+
+``` javascript
+
+angular.module('ShoppingListDirectiveApp', [])
+.controller('ShoppingListController1', ShoppingListController1)
+.controller('ShoppingListController2', ShoppingListController2)
+.factory('ShoppingListFactory', ShoppingListFactory)
+.directive('listItemDescription', ListItemDescription)
+.directive('listItem', ListItem);
+
+
+function ListItem() {
+
+    var ddo = {
+           templateUrl: 'listItem.html'
+    };
+
+    return ddo;
+
+}
+
+function ListItemDescription() {
+    var ddo = {
+        template: '{{ item.quantity }} of {{ item.name }}'
+        restrict: "E",
+    };
+
+    return ddo;
+}
+```
+
+restrict:
+
+* 'A' - only matches attribute name
+* 'E' - only matches element name
+* 'C' - only matches class name
+* 'M' - only matches comment
+
 
 ## Week 4
 Components, Events, Modules, Routers
